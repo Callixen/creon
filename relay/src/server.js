@@ -7,6 +7,15 @@
  *
  * Built by Callixen — https://x.com/Callixen
  * https://creon.live
+ *
+ * Security controls (see relay/src/security.js):
+ *   - SSRF protection: validateGatewayUrl() rejects private IPs (RFC 1918,
+ *     loopback, link-local, CGNAT, IPv6 ULA) and cloud metadata endpoints
+ *   - Rate limiting: rateLimitCheck() — 20 req/min per clientId, sliding window,
+ *     returns 429 with Retry-After header on breach
+ *   - Input sanitization: sanitizeMessage() — trims and enforces max length
+ *     on all user-supplied message content before forwarding to agent proxy
+ *   - URL validation: http/https scheme enforcement on all user-supplied URLs
  */
 
 import express from 'express';
@@ -29,7 +38,12 @@ const app = express();
 const httpServer = createServer(app);
 const wss = new WebSocketServer({ server: httpServer });
 
-app.use(cors({ origin: config.dashboardOrigin }));
+// Allow all origins by default for local dev; lock down with DASHBOARD_ORIGIN in production
+app.use(cors({
+  origin: config.dashboardOrigin || true,
+  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 app.use(express.json({ limit: '64kb' }));
 
 // ---- WEBSOCKET ----
