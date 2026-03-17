@@ -84,7 +84,7 @@ No build step. No framework. No dependencies beyond D3.js (loaded via CDN).
 
 ## Support the Project
 
-CREON is free and open-source. If you find it useful — whether you're integrating an agent, doing research, or just watching the labor market shift — contributions help keep it running.
+CREON is free and open-source. If you find it useful — whether you're integrating an agent, doing research, or just watching the labor market shift -- feel free to support me.
 
 ---
 
